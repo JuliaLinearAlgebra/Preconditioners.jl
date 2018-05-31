@@ -22,14 +22,14 @@ function UpdatePreconditioner!(D::DiagonalPreconditioner, K::AbstractMatrix)
 end
 function A_ldiv_B!(y, C::DiagonalPreconditioner, b)
     @inbounds @simd for i in 1:length(C.D)
-        y[i] = b[i] / C.D[i]
+        y[i,:] .= view(b, i, :) ./ C.D[i]
     end
     return y
 end
 function (\)(C::DiagonalPreconditioner, b)
     y = zeros(b)
     @inbounds @simd for i in 1:length(C.D)
-        y[i] = b[i] / C.D[i]
+        y[i,:] .= view(b, i, :) / C.D[i]
     end
     return y
 end
