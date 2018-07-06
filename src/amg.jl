@@ -7,12 +7,22 @@ struct SmoothedAggregation end
 for (t, f) in [(:RugeStuben, :ruge_stuben), (:SmoothedAggregation, :smoothed_aggregation)]
     @eval begin
         function AMGPreconditioner(::Type{$t}, A::AbstractMatrix)
-            ml = $f(A)
+            if A isa Symmetric
+                warn("Using the data field of the symmetric matrix input.")
+                ml = $f(A.data)
+            else
+                ml = $f(A)
+            end
             return AMGPreconditioner{$t, typeof(ml)}(ml)
         end
 
-        function UpdatePreconditioner!(C::AMGPreconditioner{$t}, A)
-            C.ml = $f(A)
+        function UpdatePreconditioner!(C::AMGPreconditioner{$t}, A::AbstractMatrix)
+            if A isa Symmetric
+                warn("Using the data field of the symmetric matrix input.")
+                C.ml = $f(A.data)
+            else
+                C.ml = $f(A)
+            end
             return C
         end
     end
