@@ -34,7 +34,7 @@ function UpdatePreconditioner!(C::CholeskyPreconditioner, A, c=C.c)
         end
     end
     C.L = LowerTriangular(L)
-    nothing
+    C
 end
 function A_ldiv_B!(y::AbstractVector{T}, C::CholeskyPreconditioner{T, S}, b::AbstractVector{T}) where {T, S}
     At_ldiv_B!(C.L, b, y)
