@@ -9,7 +9,7 @@ function EmptyCholeskyPreconditioner(A, c=1)
         return CholeskyPreconditioner{eltype(A), SparseMatrixCSC{eltype(A),Int}}(LowerTriangular(speye(A)), c)    
     end
 end
-function CholeskyPreconditioner(A, c)
+function CholeskyPreconditioner(A, c=2)
     if A isa Symmetric
         L = cldlt(A.data,c)
     else
