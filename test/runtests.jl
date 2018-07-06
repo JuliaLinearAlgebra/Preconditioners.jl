@@ -12,4 +12,9 @@ end
     A = A + A' + 30I
     p = F(A)
     @test isapprox(cg(A, A*ones(1000), Pl=p), ones(1000))
+
+    A = sprand(1000, 1000, 0.01)
+    A = A + A' + 30I
+    UpdatePreconditioner!(p, A)
+    @test isapprox(cg(A, A*ones(1000), Pl=p), ones(1000))
 end
