@@ -16,6 +16,8 @@ export  CholeskyPreconditioner,
         DiagonalPreconditioner, 
         EmptyDiagonalPreconditioner,
         AMGPreconditioner,
+        SmoothedAggregation,
+        RugeStuben,
         UpdatePreconditioner!
-        
+
 end # module

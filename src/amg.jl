@@ -1,12 +1,24 @@
-mutable struct AMGPreconditioner{TML<:AMG.MultiLevel}
+mutable struct AMGPreconditioner{S, TML<:AMG.MultiLevel}
     ml::TML
 end
-AMGPreconditioner(A::AbstractMatrix) = AMGPreconditioner(ruge_stuben(A))
+struct RugeStuben end
+struct SmoothedAggregation end
 
-function UpdatePreconditioner!(C::AMGPreconditioner, A)
-    C.ml = ruge_stuben(A)
-    return C
+for (t, f) in [(:RugeStuben, :ruge_stuben), (:SmoothedAggregation, :smoothed_aggregation)]
+    @eval begin
+        function AMGPreconditioner(::Type{$t}, A::AbstractMatrix)
+            ml = $f(A)
+            return AMGPreconditioner{$t, typeof(ml)}(ml)
+        end
+
+        function UpdatePreconditioner!(C::AMGPreconditioner{$t}, A)
+            C.ml = $f(A)
+            return C
+        end
+    end
 end
+AMGPreconditioner(A::AbstractMatrix) = AMGPreconditioner(RugeStuben, A)
+AMGPreconditioner{T}(A::AbstractMatrix) where T = AMGPreconditioner(T, A)
 
 \(p::AMGPreconditioner, b) = AMG.Preconditioner(p.ml) \ b
 *(p::AMGPreconditioner, b) = AMG.Preconditioner(p.ml) * b
