@@ -3,7 +3,7 @@ module Preconditioners
 using IncompleteSelectedInversion
 using AMG
 
-import Base.LinAlg: A_ldiv_B!, \
+import Base.LinAlg: A_ldiv_B!, \, *, A_mul_B!
 
 abstract type AbstractPreconditioner end
 
