@@ -20,7 +20,7 @@ function UpdatePreconditioner!(D::DiagonalPreconditioner, K::AbstractMatrix)
     diag!(D.D, K)
     return D
 end
-function A_ldiv_B!(y, C::DiagonalPreconditioner, b)
+function ldiv!(y, C::DiagonalPreconditioner, b)
     @inbounds @simd for i in 1:length(C.D)
         y[i,:] .= view(b, i, :) ./ C.D[i]
     end

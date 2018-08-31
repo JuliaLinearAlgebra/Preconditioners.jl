@@ -36,14 +36,15 @@ function UpdatePreconditioner!(C::CholeskyPreconditioner, A, c=C.c)
     C.L = LowerTriangular(L)
     C
 end
-function A_ldiv_B!(y::AbstractVector{T}, C::CholeskyPreconditioner{T, S}, b::AbstractVector{T}) where {T, S}
-    At_ldiv_B!(C.L, b, y)
-    A_ldiv_B!(C.L, y)
+function ldiv!(y::AbstractVector{T}, C::CholeskyPreconditioner{T, S}, b::AbstractVector{T}) where {T, S}
+    y .= b
+    ldiv!(C.L', y)
+    ldiv!(C.L, y)
     return y
 end
 function (\)(C::CholeskyPreconditioner{T, S}, b::AbstractVector{T}) where {T, S <: AbstractSparseMatrix{T}}
-    y = zeros(b)
-    At_ldiv_B!(C.L, b, y)
-    A_ldiv_B!(C.L, y)
+    y = copy(b)
+    ldiv!(C.L', y)
+    ldiv!(C.L, y)
     return y
 end
