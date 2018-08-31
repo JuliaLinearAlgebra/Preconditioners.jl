@@ -8,7 +8,7 @@ for (t, f) in [(:RugeStuben, :ruge_stuben), (:SmoothedAggregation, :smoothed_agg
     @eval begin
         function AMGPreconditioner(::Type{$t}, A::AbstractMatrix)
             if A isa Symmetric || A isa Hermitian
-                @warn("Using the data field of the symmetric matrix input.")
+                @warn("Using the data field of the symmetric/Hermitian matrix input.")
                 ml = $f(A.data)
             else
                 ml = $f(A)
@@ -18,7 +18,7 @@ for (t, f) in [(:RugeStuben, :ruge_stuben), (:SmoothedAggregation, :smoothed_agg
 
         function UpdatePreconditioner!(C::AMGPreconditioner{$t}, A::AbstractMatrix)
             if A isa Symmetric || A isa Hermitian
-                @warn("Using the data field of the symmetric matrix input.")
+                @warn("Using the data field of the symmetric/Hermitian matrix input.")
                 C.ml = $f(A.data)
             else
                 C.ml = $f(A)
