@@ -1,11 +1,22 @@
 module Preconditioners
 
-using IncompleteSelectedInversion
-using AMG
+using AlgebraicMultigrid, Compat, LimitedLDLFactorizations
+const AMG = AlgebraicMultigrid
+const LLDL = LimitedLDLFactorizations
 
-import Base.LinAlg: A_ldiv_B!, \, *, A_mul_B!
+using LinearAlgebra, SparseArrays
+import LinearAlgebra: ldiv!, \, *, mul!
 
 abstract type AbstractPreconditioner end
+
+function get_data(A)
+    if A isa Symmetric || A isa Hermitian
+        @warn("Using the data field of the symmetric/Hermitian matrix input.")
+        return A.data
+    else
+        return A
+    end
+end
 
 include("incompletecholesky.jl")
 include("diagonal.jl")
