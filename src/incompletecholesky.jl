@@ -3,12 +3,13 @@ mutable struct CholeskyPreconditioner{T, S <: AbstractSparseMatrix{T}} <: Abstra
     memory::Int
 end
 function EmptyCholeskyPreconditioner(A, memory=1)
-    _A = A isa Symmetric ? A.data : A
-    return CholeskyPreconditioner(LowerTriangular(speye(_A)), memory)
+    T = eltype(A)
+    _A = A isa Symmetric || A isa Hermitian ? A.data : A
+    return CholeskyPreconditioner(LowerTriangular(sparse(one(T)*I, size(_A)...)), memory)
 end
 
 function CholeskyPreconditioner(A, memory=2)
-    _A = A isa Symmetric ? A.data : A
+    _A = A isa Symmetric || A isa Hermitian ? A.data : A
     L, d, α = lldl(_A, memory=memory)
     assert_pd(d, α)
     update_L!(L, d)
