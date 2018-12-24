@@ -1,14 +1,14 @@
 module Preconditioners
 
-using AlgebraicMultigrid, Compat
+using AlgebraicMultigrid, Compat, LimitedLDLFactorizations
 const AMG = AlgebraicMultigrid
+const LLDL = LimitedLDLFactorizations
 
 using LinearAlgebra, SparseArrays
 import LinearAlgebra: ldiv!, \, *, mul!
 
 abstract type AbstractPreconditioner end
 
-include("incomplete_selected_inversion.jl")
 include("incompletecholesky.jl")
 include("diagonal.jl")
 include("amg.jl")
