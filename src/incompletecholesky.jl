@@ -32,7 +32,8 @@ function update_L!(L, d)
 end
 
 function UpdatePreconditioner!(C::CholeskyPreconditioner, A, memory=C.memory)
-    L, d, α = lldl(A, memory=memory)
+    _A = A isa Symmetric || A isa Hermitian ? A.data : A
+    L, d, α = lldl(_A, memory=memory)
     assert_pd(d, α)
     update_L!(L, d)
     C.L = LowerTriangular(L)
