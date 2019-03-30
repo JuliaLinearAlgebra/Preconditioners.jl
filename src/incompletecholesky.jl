@@ -42,13 +42,13 @@ end
 
 function ldiv!(y::AbstractVector{T}, C::CholeskyPreconditioner{T, S}, b::AbstractVector{T}) where {T, S}
     y .= b
-    ldiv!(C.L', y)
     ldiv!(C.L, y)
+    ldiv!(C.L', y)
     return y
 end
 function (\)(C::CholeskyPreconditioner{T, S}, b::AbstractVector{T}) where {T, S <: AbstractSparseMatrix{T}}
     y = copy(b)
-    ldiv!(C.L', y)
     ldiv!(C.L, y)
+    ldiv!(C.L', y)
     return y
 end
