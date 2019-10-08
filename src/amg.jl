@@ -28,6 +28,7 @@ AMGPreconditioner{T}(A::AbstractMatrix) where T = AMGPreconditioner(T, A)
     return ldiv!(x, AMG.Preconditioner(p.ml), b)
 end
 @inline *(p::AMGPreconditioner, b) = AMG.Preconditioner(p.ml) * b
+@inline ldiv!(p::AMGPreconditioner, b) = b .= p \ b
 @inline function ldiv!(x, p::AMGPreconditioner, b)
     x .= b
     return ldiv!(x, AMG.Preconditioner(p.ml), b)
