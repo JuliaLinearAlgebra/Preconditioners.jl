@@ -22,7 +22,7 @@ function test_matrix(A, F, atol)
         @test isapprox(C2.L, C3.L, atol=atol)
 
         C4 = CholeskyPreconditioner(A, n)
-        @test isapprox(norm(C4 \ b - Symmetric(A) \ b, Inf), 0.0, atol=0.001)
+        @test isapprox(norm(C4 \ b - Symmetric(A) \ b, Inf), 0.0, atol=atol)
     end
     if F === RugeStuben || F === SmoothedAggregation
         p = AMGPreconditioner(F, A)
