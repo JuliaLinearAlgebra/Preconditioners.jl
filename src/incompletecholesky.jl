@@ -40,15 +40,15 @@ function UpdatePreconditioner!(C::CholeskyPreconditioner, A, memory=C.memory)
     return C
 end
 
-function ldiv!(y::AbstractVector{T}, C::CholeskyPreconditioner{T, S}, b::AbstractVector{T}) where {T, S}
-    y .= b
+@inline function ldiv!(C::CholeskyPreconditioner{T}, y::AbstractVector{T}) where {T}
     ldiv!(C.L, y)
-    ldiv!(C.L', y)
-    return y
+    return ldiv!(C.L', y)
 end
-function (\)(C::CholeskyPreconditioner{T, S}, b::AbstractVector{T}) where {T, S <: AbstractSparseMatrix{T}}
+@inline function ldiv!(y::AbstractVector{T}, C::CholeskyPreconditioner{T}, b::AbstractVector{T}) where {T}
+    y .= b
+    return ldiv!(C, y)
+end
+@inline function (\)(C::CholeskyPreconditioner{T, <:AbstractSparseMatrix{T}}, b::AbstractVector{T}) where {T}
     y = copy(b)
-    ldiv!(C.L, y)
-    ldiv!(C.L', y)
-    return y
+    return ldiv!(C, y)
 end
