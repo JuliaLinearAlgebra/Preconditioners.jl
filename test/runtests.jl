@@ -44,7 +44,7 @@ end
 
 @testset "$T preconditioner" for (T, F) in (("Diagonal", DiagonalPreconditioner), ("Incomplete Cholesky", CholeskyPreconditioner), ("AMG Ruge-Stuben", RugeStuben), ("AMG Smoothed Aggregation", SmoothedAggregation))
     n = 100
-    atol = sqrt(eps(Float64))*n
+    atol = 0.01
     A = sprand(n, n, 10/n)
     A = A + A' + 50I
     test_matrix(A, F, atol)
