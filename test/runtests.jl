@@ -10,6 +10,7 @@ Random.seed!(1)
 
 function test_matrix(A, F, atol)
     n = size(A, 1)
+    b = ones(n)
     if F === CholeskyPreconditioner
         C1 = EmptyCholeskyPreconditioner(A)
         UpdatePreconditioner!(C1, A, 2)
@@ -21,22 +22,24 @@ function test_matrix(A, F, atol)
         @test isapprox(C2.L, C3.L, atol=atol)
 
         C4 = CholeskyPreconditioner(A, n)
-        @test isapprox(norm(C4 \ ones(n) - Symmetric(A) \ ones(n), Inf), 0.0, atol=0.001)
+        @test isapprox(norm(C4 \ b - Symmetric(A) \ b, Inf), 0.0, atol=0.001)
     end
     if F === RugeStuben || F === SmoothedAggregation
         p = AMGPreconditioner(F, A)
     else
         p = F(A)
     end
-    @test isapprox(cg(A, A*ones(n), Pl=p), ones(n), atol=atol)
+    @test isapprox(p \ b, ldiv!(p, b), atol=atol)
+    @test isapprox(ldiv!(copy(b), p, b), ldiv!(p, b), atol=atol)
+    @test isapprox(cg(A, A*b, Pl=p), b, atol=atol)
     if F === RugeStuben
         p = AMGPreconditioner(F, A)
-        @test isapprox(cg(A, A*ones(n), Pl=p), ones(n), atol=atol)
+        @test isapprox(cg(A, A*b, Pl=p), b, atol=atol)
     end
     A = sprand(n, n, 10/n)
     A = A + A' + 30I
     UpdatePreconditioner!(p, A)
-    @test isapprox(cg(A, A*ones(n), Pl=p), ones(n), atol=atol)
+    @test isapprox(cg(A, A*b, Pl=p), b, atol=atol)
 end
 
 @testset "$T preconditioner" for (T, F) in (("Diagonal", DiagonalPreconditioner), ("Incomplete Cholesky", CholeskyPreconditioner), ("AMG Ruge-Stuben", RugeStuben), ("AMG Smoothed Aggregation", SmoothedAggregation))
