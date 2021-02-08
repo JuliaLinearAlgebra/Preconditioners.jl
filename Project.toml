@@ -12,7 +12,7 @@ SparseArrays = "2f01184e-e22b-5df5-ae63-d93ebab69eaf"
 [compat]
 julia = "1"
 AlgebraicMultigrid = "0.4"
-Compat = "3"
+Compat = "2, 3"
 LimitedLDLFactorizations = "0.3"
 
 [extras]
