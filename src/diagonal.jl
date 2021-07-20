@@ -22,16 +22,19 @@ function UpdatePreconditioner!(D::DiagonalPreconditioner, K::AbstractMatrix)
 end
 @inline ldiv!(C::DiagonalPreconditioner, b) = ldiv!(b, C, b)
 @inline function ldiv!(y, C::DiagonalPreconditioner, b)
-    @inbounds @simd for i in 1:length(C.D)
-        y[i,:] .= view(b, i, :) ./ C.D[i]
+    @inbounds @simd for j ∈ 1:size(y, 2)
+        for i ∈ 1:length(C.D)
+            y[i,j] = b[i,j] / C.D[i]
+        end
     end
     return y
 end
 @inline function (\)(C::DiagonalPreconditioner, b)
     y = zero(b)
-    @inbounds @simd for i in 1:length(C.D)
-        y[i,:] .= view(b, i, :) / C.D[i]
+    @inbounds @simd for j ∈ 1:size(y, 2)
+        for i ∈ 1:length(C.D)
+            y[i,j] = b[i,j] / C.D[i]
+        end
     end
     return y
 end
-
