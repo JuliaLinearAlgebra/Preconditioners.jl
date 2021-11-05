@@ -1,15 +1,16 @@
-mutable struct AMGPreconditioner{T, TML<:AMG.MultiLevel}
+mutable struct AMGPreconditioner{T, TML<:AMG.MultiLevel, C<:AMG.Cycle}
     ml::TML
+    cycle::C
 end
 struct RugeStuben end
 struct SmoothedAggregation end
 
 for (t, f) in [(:RugeStuben, :ruge_stuben), (:SmoothedAggregation, :smoothed_aggregation)]
     @eval begin
-        function AMGPreconditioner(::Type{$t}, A::AbstractMatrix)
+        function AMGPreconditioner(::Type{$t}, A::AbstractMatrix; cycle = AMG.V())
             _A = get_data(A)
             ml = $f(_A)
-            return AMGPreconditioner{$t, typeof(ml)}(ml)
+            return AMGPreconditioner{$t, typeof(ml), typeof(cycle)}(ml, cycle)
         end
 
         function UpdatePreconditioner!(C::AMGPreconditioner{$t}, A::AbstractMatrix)
@@ -20,17 +21,17 @@ for (t, f) in [(:RugeStuben, :ruge_stuben), (:SmoothedAggregation, :smoothed_agg
     end
 end
 
-AMGPreconditioner(A::AbstractMatrix) = AMGPreconditioner(RugeStuben, A)
-AMGPreconditioner{T}(A::AbstractMatrix) where T = AMGPreconditioner(T, A)
+AMGPreconditioner(A::AbstractMatrix; kwargs...) = AMGPreconditioner(RugeStuben, A; kwargs...)
+AMGPreconditioner{T}(A::AbstractMatrix; kwargs...) where T = AMGPreconditioner(T, A; kwargs...)
 
 @inline function \(p::AMGPreconditioner, b)
     x = copy(b); 
-    return ldiv!(x, AMG.Preconditioner(p.ml), b)
+    return ldiv!(x, AMG.Preconditioner(p.ml, p.cycle), b)
 end
-@inline *(p::AMGPreconditioner, b) = AMG.Preconditioner(p.ml) * b
+@inline *(p::AMGPreconditioner, b) = AMG.Preconditioner(p.ml, p.cycle) * b
 @inline ldiv!(p::AMGPreconditioner, b) = b .= p \ b
 @inline function ldiv!(x, p::AMGPreconditioner, b)
     x .= b
-    return ldiv!(x, AMG.Preconditioner(p.ml), b)
+    return ldiv!(x, AMG.Preconditioner(p.ml, p.cycle), b)
 end
-@inline mul!(b, p::AMGPreconditioner, x) = mul!(b, AMG.Preconditioner(p.ml), x)
+@inline mul!(b, p::AMGPreconditioner, x) = mul!(b, AMG.Preconditioner(p.ml, p.cycle), x)
