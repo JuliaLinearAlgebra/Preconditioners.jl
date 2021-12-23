@@ -13,7 +13,7 @@ SparseArrays = "2f01184e-e22b-5df5-ae63-d93ebab69eaf"
 julia = "1"
 AlgebraicMultigrid = "0.4"
 Compat = "1, 2, 3"
-LimitedLDLFactorizations = "0.1, 0.2, 0.3"
+LimitedLDLFactorizations = "0.1, 0.2, 0.3, 0.4"
 
 [extras]
 IterativeSolvers = "42fd0dbc-a981-5370-80f2-aaf504508153"
