@@ -2,53 +2,32 @@ function assert_pd(d, α)
     @assert α == 0 && all(x -> x > 0, d) "The input matrix is not positive definite."
 end
 
-function update_L!(L, d)
-    @inbounds for j in 1:size(L, 2)
-        _d = sqrt(d[j])
-        L[j,j] = _d
-        for i in Base.Iterators.drop(nzrange(L, j), 1)
-            L.nzval[i] *= _d
-        end
-    end
-    return L
-end
-
-mutable struct CholeskyPreconditioner{T, S <: AbstractSparseMatrix{T}} <: AbstractPreconditioner
-    L::LowerTriangular{T, S}
+mutable struct CholeskyPreconditioner{L} <: AbstractPreconditioner
+    ldlt::L
     memory::Int
-end
-function EmptyCholeskyPreconditioner(A, memory=1)
-    T = eltype(A)
-    _A = A isa Symmetric || A isa Hermitian ? A.data : A
-    return CholeskyPreconditioner(LowerTriangular(sparse(one(T)*I, size(_A)...)), memory)
-end
-
-function CholeskyPreconditioner(A, memory=2)
-    _A = get_data(A)
-    LLDL = lldl(_A, memory=memory)
-    assert_pd(LLDL.D, LLDL.α)
-    update_L!(LLDL.L, LLDL.D)
-    return CholeskyPreconditioner(LowerTriangular(LLDL.L), memory)
+    function CholeskyPreconditioner(A, memory=2)
+        _A = get_data(A)
+        LLDL = lldl(_A, memory=memory)
+        assert_pd(LLDL.D, LLDL.α)
+        return new{typeof(LLDL)}(LLDL, memory)
+    end
 end
 
 function UpdatePreconditioner!(C::CholeskyPreconditioner, A, memory=C.memory)
     _A = get_data(A)
     LLDL = lldl(_A, memory=memory)
     assert_pd(LLDL.D, LLDL.α)
-    update_L!(LLDL.L, LLDL.D)
-    C.L = LowerTriangular(LLDL.L)
+    C.ldlt = LLDL
     return C
 end
 
-@inline function ldiv!(C::CholeskyPreconditioner{T}, y::AbstractVector{T}) where {T}
-    ldiv!(C.L, y)
-    return ldiv!(C.L', y)
+@inline function ldiv!(C::CholeskyPreconditioner, y::AbstractVector) where {T}
+    ldiv!(y, C.ldlt, copy(y))
+    return y
 end
-@inline function ldiv!(y::AbstractVector{T}, C::CholeskyPreconditioner{T}, b::AbstractVector{T}) where {T}
-    y .= b
-    return ldiv!(C, y)
+@inline function ldiv!(y::AbstractVector, C::CholeskyPreconditioner, b::AbstractVector)
+    return ldiv!(y, C.ldlt, b)
 end
-@inline function (\)(C::CholeskyPreconditioner{T, <:AbstractSparseMatrix{T}}, b::AbstractVector{T}) where {T}
-    y = copy(b)
-    return ldiv!(C, y)
+@inline function (\)(C::CholeskyPreconditioner, b::AbstractVector)
+    return ldiv!(copy(b), C.ldlt, b)
 end
