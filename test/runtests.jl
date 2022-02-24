@@ -6,17 +6,9 @@ function test_matrix(A, F, atol)
     n = size(A, 1)
     b = ones(n)
     if F === CholeskyPreconditioner
-        C1 = EmptyCholeskyPreconditioner(A)
-        UpdatePreconditioner!(C1, A, 2)
-
-        C2 = CholeskyPreconditioner(A, 2)
-        @test isapprox(C1.L, C2.L, atol=atol)
-
-        C3 = CholeskyPreconditioner(Symmetric(A), 2)
-        @test isapprox(C2.L, C3.L, atol=atol)
-
-        C4 = CholeskyPreconditioner(A, n)
-        @test isapprox(norm(C4 \ b - Symmetric(A) \ b, Inf), 0.0, atol=atol)
+        C = CholeskyPreconditioner(A, n)
+        @test isapprox(norm(C \ b - Symmetric(A) \ b, Inf), 0.0, atol=atol)
+        UpdatePreconditioner!(C, A, 2)
     end
     if F === RugeStuben || F === SmoothedAggregation
         p = AMGPreconditioner(F, A)
