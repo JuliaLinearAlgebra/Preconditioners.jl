@@ -15,6 +15,9 @@ function test_matrix(A, F, atol)
     else
         p = F(A)
     end
+    if F === DiagonalPreconditioner
+        @test p.D isa Vector
+    end
     @test isapprox(p \ b, ldiv!(p, b), atol=atol)
     @test isapprox(ldiv!(copy(b), p, b), ldiv!(p, b), atol=atol)
     @test isapprox(cg(A, A*b, Pl=p), b, atol=atol)
