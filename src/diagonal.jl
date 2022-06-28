@@ -25,9 +25,11 @@ function DiagonalPreconditioner(A::AbstractMatrix)
     return DiagonalPreconditioner{eltype(D), typeof(D)}(D)
 end
 function diag!(D, A::AbstractMatrix)
-    length(D) == size(A,1) == size(A,2) || throw("D and A sizes are not compatible.")
-    @inbounds @simd for i in 1:length(D)
-        D[i] = A[i,i]
+    if !(axes(D, 1) == axes(A, 1) == axes(A, 2))
+        throw(ArgumentError("incompatible indices for input arguments"))
+    end
+    @inbounds for (i, j, k) in zip(eachindex(D), axes(A, 1), axes(A, 2))
+        D[i] = A[j, k]
     end
     return
 end
@@ -35,21 +37,18 @@ function UpdatePreconditioner!(D::DiagonalPreconditioner, K::AbstractMatrix)
     diag!(D.D, K)
     return D
 end
-@inline ldiv!(C::DiagonalPreconditioner, b) = ldiv!(b, C, b)
-@inline function ldiv!(y, C::DiagonalPreconditioner, b)
-    @inbounds @simd for j ∈ 1:size(y, 2)
-        for i ∈ 1:length(C.D)
-            y[i,j] = b[i,j] / C.D[i]
+ldiv!(C::DiagonalPreconditioner, b) = ldiv!(b, C, b)
+function ldiv!(y, C::DiagonalPreconditioner, b)
+    if !(axes(y, 1) == axes(b, 1) == axes(C.D, 1) && axes(y, 2) == axes(b, 2))
+        throw(ArgumentError("incompatible indices for input arguments"))
+    end
+    @inbounds for (yj, bj) in zip(axes(y, 2), axes(b, 2))
+        for (yi, bi, Di) in zip(axes(y, 1), axes(b, 1), eachindex(C.D))
+            y[yi, yj] = b[bi, bj] / C.D[Di]
         end
     end
     return y
 end
-@inline function (\)(C::DiagonalPreconditioner, b)
-    y = zero(b)
-    @inbounds @simd for j ∈ 1:size(y, 2)
-        for i ∈ 1:length(C.D)
-            y[i,j] = b[i,j] / C.D[i]
-        end
-    end
-    return y
+function (\)(C::DiagonalPreconditioner, b)
+    return ldiv!(similar(b), C, b)
 end
