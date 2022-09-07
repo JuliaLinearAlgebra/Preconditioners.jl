@@ -14,19 +14,25 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        julia-version: ['1.6',]
-        os: ['ubuntu-latest',]
+        julia-version:
+          - '1.6'
+          - '1'
+          - 'nightly'
+        os:
+          - 'ubuntu-latest'
+        include:
+          - os: windows-latest
+            julia-version: '1'
+          - os: macOS-lastest
+            julia-version: '1'
     steps:
-      - name: Checkout
-        uses: actions/checkout@v2
+      - uses: actions/checkout@v2
       - uses: julia-actions/setup-julia@v1
         with:
           version: ${{ matrix.julia-version }}
       - uses: julia-actions/julia-buildpkg@v1
       - uses: julia-actions/julia-runtest@v1
       - uses: julia-actions/julia-processcoverage@v1
-        if: ${{ matrix.julia-version == '1.6' && matrix.os == 'ubuntu-latest' }}
       - uses: codecov/codecov-action@v1
-        if: ${{ matrix.julia-version == '1.6' && matrix.os == 'ubuntu-latest' }}
         with:
           file: lcov.info
