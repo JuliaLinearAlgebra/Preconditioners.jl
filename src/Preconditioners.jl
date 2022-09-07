@@ -1,6 +1,6 @@
 module Preconditioners
 
-using AlgebraicMultigrid, Compat, LimitedLDLFactorizations
+using AlgebraicMultigrid, LimitedLDLFactorizations
 const AMG = AlgebraicMultigrid
 const LLDL = LimitedLDLFactorizations
 
