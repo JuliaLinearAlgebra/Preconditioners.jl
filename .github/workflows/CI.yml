@@ -23,7 +23,7 @@ jobs:
         include:
           - os: windows-latest
             julia-version: '1'
-          - os: macOS-lastest
+          - os: macOS-latest
             julia-version: '1'
     steps:
       - uses: actions/checkout@v2
