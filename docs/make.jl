@@ -16,7 +16,7 @@ gen = joinpath(@__DIR__, "src/generated")
 
 base = "$org/$reps.jl"
 repo_root_url =
-    "https://github.com/$base/blob/main/docs/lit/examples"
+    "https://github.com/$base/blob/master/docs/lit/examples"
 nbviewer_root_url =
     "https://nbviewer.org/github/$base/tree/gh-pages/dev/generated/examples"
 binder_root_url =
@@ -46,7 +46,7 @@ isci = get(ENV, "CI", nothing) == "true"
 
 format = Documenter.HTML(;
     prettyurls = isci,
-    edit_link = "main",
+    edit_link = "master",
     canonical = "https://$org.github.io/$repo.jl/stable/",
     assets = ["assets/custom.css"],
 )
@@ -66,7 +66,7 @@ makedocs(;
 if isci
     deploydocs(;
         repo = "github.com/$base",
-        devbranch = "main",
+        devbranch = "master",
         devurl = "dev",
         versions = ["stable" => "v^", "dev" => "dev"],
         forcepush = true,
