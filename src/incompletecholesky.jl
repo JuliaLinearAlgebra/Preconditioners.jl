@@ -21,7 +21,7 @@ function UpdatePreconditioner!(C::CholeskyPreconditioner, A, memory=C.memory)
     return C
 end
 
-@inline function ldiv!(C::CholeskyPreconditioner, y::AbstractVector) where {T}
+@inline function ldiv!(C::CholeskyPreconditioner, y::AbstractVector)
     ldiv!(y, C.ldlt, copy(y))
     return y
 end

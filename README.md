@@ -36,3 +36,17 @@ UpdatePreconditioner!(p, A)
 ## Advanced AMG preconditioners
 
 More advanced AMG preconditioners are also possible by building the `MultiLevel` struct that `AMGPreconditioner` wraps yourself using the package [AMG.jl](https://github.com/JuliaLinearAlgebra/AlgebraicMultigrid.jl).
+
+## Citing Preconditioners.jl
+
+If you use Preconditioners for your own research, please consider citing the following publication: Mohamed Tarek. Preconditioners.jl: A Flexible and Extensible Framework for Preconditioning in Iterative Solvers. 2023. doi: 10.13140/RG.2.2.26655.02721.
+```
+@article{MohamedTarekPreconditionersjl,
+  doi = {10.13140/RG.2.2.26655.02721},
+  url = {https://rgdoi.net/10.13140/RG.2.2.26655.02721},
+  author = {Tarek,  Mohamed},
+  language = {en},
+  title = {Preconditioners.jl: A Flexible and Extensible Framework for Preconditioning in Iterative Solvers},
+  year = {2023}
+}
+```
