@@ -1,7 +1,14 @@
-using LinearAlgebra, SparseArrays, Preconditioners, IterativeSolvers, Random, Test
-using OffsetArrays
+using LinearAlgebra: I, diag, ldiv!, norm, Symmetric, Hermitian
+using SparseArrays: sprand
+using Preconditioners: CholeskyPreconditioner, DiagonalPreconditioner
+using Preconditioners: RugeStuben, SmoothedAggregation
+using Preconditioners: UpdatePreconditioner!, AMGPreconditioner
+using IterativeSolvers: cg
+using Random: seed!
+using Test: @test, @testset, @test_throws
+using OffsetArrays: OffsetMatrix, OffsetVector
 
-Random.seed!(1)
+seed!(1)
 
 function test_matrix(A, F, atol)
     n = size(A, 1)
@@ -10,6 +17,8 @@ function test_matrix(A, F, atol)
         C = CholeskyPreconditioner(A, n)
         @test isapprox(norm(C \ b - Symmetric(A) \ b, Inf), 0.0, atol=atol)
         UpdatePreconditioner!(C, A, 2)
+
+        C2 = CholeskyPreconditioner(A, n; check_tril = true) # check kwargs
     end
     if F === RugeStuben || F === SmoothedAggregation
         p = AMGPreconditioner(F, A)
