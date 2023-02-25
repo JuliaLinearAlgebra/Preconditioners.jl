@@ -1,8 +1,6 @@
-#---------------------------------------------------------
-# # [Preconditioners overview](@id 1-overview)
-#---------------------------------------------------------
-
 #=
+# [Preconditioners overview](@id 1-overview)
+
 This page illustrates some of the method(s) in the Julia package
 [`Preconditioners.jl`](https://github.com/JuliaLinearAlgebra/Preconditioners.jl).
 
@@ -32,16 +30,15 @@ using LinearAlgebra: I, cond
 
 
 #=
-### Overview
+## Overview
 
 Preconditioning is useful
 for accelerating solutions
 to systems of equations
 and optimization problems.
-=#
 
-#=
-### Examples
+
+## Examples
 =#
 
 n = 1000
@@ -54,16 +51,17 @@ cA = cond(Matrix(A), 2)
 # Diagonal preconditioner
 Dp = DiagonalPreconditioner(A)
 
-# apply preconditioner
+# Apply preconditioner
 DA = Dp \ A
 
-# examine effect on condition number
+# Examine effect on condition number
 cd = cond(Matrix(DA), 2)
 
 # Incomplete Cholesky preconditioner with cut-off level 2
 Pc = CholeskyPreconditioner(A, 2)
 
-# Here is a temporary fix
+# Here is a quick way to handle a matrix argument.
+# This could be done more efficiently eventually; see Issue #33.
 import Base.\
 \(C::CholeskyPreconditioner, A::AbstractMatrix) = reduce(hcat, [C \ c for c in eachcol(A)])
 
@@ -77,10 +75,7 @@ cc = cond(Matrix(CA), 2)
 # ### Reproducibility
 
 # This page was generated with the following version of Julia:
-
 io = IOBuffer(); versioninfo(io); split(String(take!(io)), '\n')
 
-
 # And with the following package versions
-
 import Pkg; Pkg.status()
