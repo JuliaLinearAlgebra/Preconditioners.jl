@@ -1,6 +1,6 @@
 name = "Preconditioners"
 uuid = "af69fa37-3177-5a40-98ee-561f696e4fcd"
-version = "0.5.2"
+version = "0.6"
 
 [deps]
 AlgebraicMultigrid = "2169fc97-5a83-5252-b627-83903c6c433c"
@@ -10,7 +10,7 @@ SparseArrays = "2f01184e-e22b-5df5-ae63-d93ebab69eaf"
 
 [compat]
 AlgebraicMultigrid = "0.4, 0.5"
-LimitedLDLFactorizations = "0.4"
+LimitedLDLFactorizations = "0.4, 0.5"
 julia = "1.6"
 
 [extras]
