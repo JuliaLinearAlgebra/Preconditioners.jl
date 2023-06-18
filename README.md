@@ -1,6 +1,7 @@
 # Preconditioners
 
-[![Build Status](https://travis-ci.org/JuliaLinearAlgebra/Preconditioners.jl.svg?branch=master)](https://travis-ci.org/JuliaLinearAlgebra/Preconditioners.jl) [![codecov.io](http://codecov.io/github/JuliaLinearAlgebra/Preconditioners.jl/coverage.svg?branch=master)](http://codecov.io/github/JuliaLinearAlgebra/Preconditioners.jl?branch=master)
+[![Build Status](https://github.com/JuliaLinearAlgebra/Preconditioners.jl/actions/workflows/CI.yml/badge.svg?branch=master)](https://github.com/JuliaLinearAlgebra/Preconditioners.jl/actions/workflows/CI.yml?query=branch%3Amaster)
+[![Coverage](https://codecov.io/gh/JuliaLinearAlgebra/Preconditioners.jl/branch/master/graph/badge.svg)](https://codecov.io/gh/JuliaLinearAlgebra/Preconditioners.jl)
 
 ## Examples
 
