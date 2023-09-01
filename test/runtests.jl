@@ -1,9 +1,9 @@
-using LinearAlgebra: I, diag, ldiv!, norm, Symmetric, Hermitian
+using LinearAlgebra: I, diag, ldiv!, norm, Symmetric, Hermitian, eigen
 using SparseArrays: sprand
 using Preconditioners: CholeskyPreconditioner, DiagonalPreconditioner
 using Preconditioners: RugeStuben, SmoothedAggregation
 using Preconditioners: UpdatePreconditioner!, AMGPreconditioner
-using IterativeSolvers: cg
+using IterativeSolvers: cg, lobpcg
 using Random: seed!
 using Test: @test, @testset, @test_throws
 using OffsetArrays: OffsetMatrix, OffsetVector
@@ -67,4 +67,18 @@ end
     test_matrix(A, F, atol)
     test_matrix(Symmetric(A), F, atol)
     test_matrix(Hermitian(A), F, atol)
+end
+
+@testset "AMG + LOBPCG" begin
+    A = sprand(1000, 1000, 0.01)
+    A = A + A' + 30I
+    X0 = randn(1000,1)
+    tol = 1e-3
+    F = lobpcg(A, false, X0, tol=tol, maxiter=200, P=AMGPreconditioner{SmoothedAggregation}(A))
+    @test eigen(Matrix(A)).values[1] ≈ F.λ[1] atol = 1e-3
+
+    X0 = randn(1000,2)
+    tol = 1e-3
+    F = lobpcg(A, false, X0, tol=tol, maxiter=200, P=AMGPreconditioner{SmoothedAggregation}(A))
+    @test eigen(Matrix(A)).values[1:2] ≈ F.λ atol = 1e-3
 end
