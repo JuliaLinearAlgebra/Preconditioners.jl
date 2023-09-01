@@ -25,13 +25,19 @@ AMGPreconditioner(A::AbstractMatrix; kwargs...) = AMGPreconditioner(RugeStuben, 
 AMGPreconditioner{T}(A::AbstractMatrix; kwargs...) where T = AMGPreconditioner(T, A; kwargs...)
 
 @inline function \(p::AMGPreconditioner, b)
-    x = copy(b); 
+    x = copy(b)
     return ldiv!(x, AMG.Preconditioner(p.ml, p.cycle), b)
 end
 @inline *(p::AMGPreconditioner, b) = AMG.Preconditioner(p.ml, p.cycle) * b
 @inline ldiv!(p::AMGPreconditioner, b) = b .= p \ b
-@inline function ldiv!(x, p::AMGPreconditioner, b)
+@inline function ldiv!(x::AbstractVector, p::AMGPreconditioner, b::AbstractVector)
     x .= b
     return ldiv!(x, AMG.Preconditioner(p.ml, p.cycle), b)
+end
+@inline function ldiv!(x::AbstractMatrix, p::AMGPreconditioner, b::AbstractMatrix)
+    foreach(zip(eachcol(x), eachcol(b))) do (_x, _b)
+        ldiv!(_x, p, _b)
+    end
+    return x
 end
 @inline mul!(b, p::AMGPreconditioner, x) = mul!(b, AMG.Preconditioner(p.ml, p.cycle), x)
